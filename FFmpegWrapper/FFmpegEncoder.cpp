@@ -396,9 +396,9 @@ void FFmpegEncoder::open(const char *fileName, bool openCodec)
 		/// END
 		*/
 
-        // set the PixelFormat of the target encoded video
-        if (videoCodec->pix_fmts)
-			videoCodecContext->pix_fmt = SelectBestFormat(videoCodec, (PixelFormat)videoParam.pixelFormat);
+		// set the PixelFormat of the target encoded video
+		if (videoCodec->pix_fmts)
+			videoCodecContext->pix_fmt = SelectBestFormat(videoCodec, (AVPixelFormat)videoParam.pixelFormat);
 		/* Some formats want stream headers to be separate. */
 		if (outputFormat && outputFormat->flags & AVFMT_GLOBALHEADER)
 			videoCodecContext->flags |= CODEC_FLAG_GLOBAL_HEADER;
@@ -516,7 +516,7 @@ void FFmpegEncoder::open(const char *fileName, bool openCodec)
 			audioBufferSize = av_samples_get_buffer_size(NULL, audioCodecContext->channels, audioBufferSize, 
 				audioCodecContext->sample_fmt, 0);
 		}
-    }
+	}
 #ifdef FFMPEG51
 	// set the output parameters (must be done even if no parameters).
 	if (hasOutput)
@@ -530,21 +530,21 @@ void FFmpegEncoder::open(const char *fileName, bool openCodec)
 
     dump_format(outputContext, 0, fileName, 1);
 
-    // open the output file, if needed
-    if (hasOutput)
-    {
-        if (url_fopen(&outputContext->pb, fileName, URL_WRONLY) < 0)
-        {
-            throw runtime_error(string("Could not open the file: ") + fileName);
-        }
+	// open the output file, if needed
+	if (hasOutput)
+	{
+		if (url_fopen(&outputContext->pb, fileName, URL_WRONLY) < 0)
+		{
+			throw runtime_error(string("Could not open the file: ") + fileName);
+		}
 		
-        // write the stream header, if any
-        if (av_write_header(outputContext))
-        {
-            throw runtime_error("Could not write the video header.");
-        }
-    }
-    opened = true;
+		// write the stream header, if any
+		if (av_write_header(outputContext))
+		{
+			throw runtime_error("Could not write the video header.");
+		}
+	}
+	opened = true;
 }
 
 void FFmpegEncoder::close()
@@ -596,7 +596,7 @@ void FFmpegEncoder::close()
 		av_free_packet(audioPkt);
 		audioBufferSize = 0;
     }
-	RlsResample();
+    RlsResample();
 	
     av_freep(&outputContext);
 
@@ -614,9 +614,9 @@ void FFmpegEncoder::close()
 int FFmpegEncoder::encodeVideoData(AVPicture *picture, int64_t tsp)
 {
 
-	AVFrame frame;
-	// set default value
-	avcodec_get_frame_defaults(&frame);
+  AVFrame frame = {0};
+  // set default value
+  // avcodec_get_frame_defaults(&frame);
 
     // convert the pixel format if needed
     if (videoParam.pixelFormat != videoCodecContext->pix_fmt)
@@ -777,8 +777,8 @@ int FFmpegEncoder::encodeAudioData(uint8_t *frameData, int dataSize)
     }
 	// av_init_packet(&audioPkt);
 	bool bEnc = true;
-	AVFrame frame;
-	avcodec_get_frame_defaults(&frame);
+  AVFrame frame = {0};
+	//avcodec_get_frame_defaults(&frame);
 
 	if(!m_pResample){
 		// 不这么设的话，好像avcodec_fill_audio_frame不工作

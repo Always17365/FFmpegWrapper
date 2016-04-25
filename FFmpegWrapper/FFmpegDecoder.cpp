@@ -397,10 +397,10 @@ int FFmpegDecoder::readFrame()
 void FFmpegDecoder::decodeVideoFrame(bool bFreePkt)
 {
     int decodedSize, gotPicture = 0;
-    AVFrame videoFrame;
+    AVFrame videoFrame = {0};
 
     // set default value
-    avcodec_get_frame_defaults(&videoFrame);
+    //avcodec_get_frame_defaults(&videoFrame);
 
     // decode the video frame
 #ifdef FFMPEG51
@@ -476,15 +476,19 @@ void FFmpegDecoder::decodeAudioFrame(bool bFreePkt)
 	AVPacket pack;
 	pack.data = audioPacketData;
 	pack.size = audioPacketSize;
+  /*
 	decodedSize = avcodec_decode_audio3(audioCodecContext, 
 		(int16_t *)audioFrameBuffer, &outputFrameSize,
 		&pack);
-	/*
-	AVFrame frame; int got_frame =0;
-	decodedSize = avcodec_decode_audio4(audioCodecContext, &frame, &got_frame, &pack);
+  */
+  AVFrame* frame = av_frame_alloc();
+  int got_frame =0;
+	decodedSize = avcodec_decode_audio4(audioCodecContext, frame, &got_frame, &pack);
 	if(got_frame){
-		av_samples_get_buffer_size()
-	}*/
+    outputFrameSize = frame->nb_samples * frame->channels;
+    memcpy(audioFrameBuffer, frame->data, outputFrameSize);
+	}
+  av_frame_free(&frame);
 #endif
 
     audioFrameSize = outputFrameSize;

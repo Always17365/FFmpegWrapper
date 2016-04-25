@@ -51,7 +51,7 @@ AVPixelFormat SelectBestFormat(AVCodec* videoCodec, AVPixelFormat dstFmt)
 	{
 		// try to find the PixelFormat required by the input param,
 		// use the default PixelFormat directly if required format not found
-		const enum PixelFormat *p= videoCodec->pix_fmts;
+		const enum AVPixelFormat *p= videoCodec->pix_fmts;
 		for ( ; *p != PIX_FMT_NONE; p ++)
 		{
 			if (*p == dstFmt)
